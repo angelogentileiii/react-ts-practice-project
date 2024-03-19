@@ -4,6 +4,7 @@ import { SESSIONS } from '../dummy-sessions.ts';
 import { useState } from 'react';
 import Button from '../components/ui/Button.tsx';
 import BookSession from '../components/sessions/BookSession.tsx';
+import { useSessionsContext } from '../components/store/sessions-context.tsx';
 
 export default function SessionPage() {
   const params = useParams<{ id: string }>();
@@ -11,6 +12,8 @@ export default function SessionPage() {
 
   const sessionId = params.id;
   const loadedSession = SESSIONS.find((session) => session.id === sessionId);
+
+  const sessionContext = useSessionsContext();
 
   if (!loadedSession) {
     return (
@@ -50,7 +53,11 @@ export default function SessionPage() {
               })}
             </time>
             <p>
-              <Button onClick={handleStartBooking}>Book Session</Button>
+              {sessionContext.upcomingSessions.some((session) => session.id === loadedSession.id) ? (
+                <Button onClick={() => sessionContext.cancelSession(loadedSession.id)}>Cancel Session</Button>
+              ) : (
+                <Button onClick={handleStartBooking}>Book Session</Button>
+              )}
               <Button style={{marginLeft: '0.5rem' }} to="/sessions">Return to Sessions</Button>
             </p>
           </div>
